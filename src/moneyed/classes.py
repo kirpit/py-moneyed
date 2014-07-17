@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
-from __future__ import unicode_literals
 
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal
 
 # Default, non-existent, currency
 DEFAULT_CURRENCY_CODE = 'XYZ'
@@ -23,18 +21,14 @@ class Currency(object):
         self.name = name
         self.numeric = numeric
 
-    def __repr__(self):
-        return self.code
-
     def __eq__(self, other):
-        return (isinstance(other, Currency) and
-                (self.code == other.code) and
-                (self.countries == other.countries) and
-                (self.name == other.name) and
-                (self.numeric == other.numeric))
+        return type(self) is type(other) and self.code == other.code
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __repr__(self):
+        return self.code
 
 
 class MoneyComparisonError(TypeError):
@@ -55,7 +49,7 @@ class CurrencyDoesNotExist(Exception):
 
     def __init__(self, code):
         super(CurrencyDoesNotExist, self).__init__(
-            "No currency with code %s is defined." % code)
+            u"No currency with code %s is defined." % code)
 
 
 class Money(object):
@@ -76,8 +70,7 @@ class Money(object):
         self.currency = currency
 
     def __repr__(self):
-        return "%s %s" % (self.amount.to_integral_value(ROUND_DOWN),
-                          self.currency)
+        return u"%s %s" % (self.amount, self.currency)
 
     def __unicode__(self):
         from moneyed.localization import format_money
@@ -94,7 +87,7 @@ class Money(object):
 
     def __neg__(self):
         return Money(
-            amount= -self.amount,
+            amount=-self.amount,
             currency=self.currency)
 
     def __add__(self, other):
@@ -120,7 +113,7 @@ class Money(object):
                 amount=(self.amount * Decimal(str(other))),
                 currency=self.currency)
 
-    def __truediv__(self, other):
+    def __div__(self, other):
         if isinstance(other, Money):
             if self.currency != other.currency:
                 raise TypeError('Cannot divide two different currencies.')
@@ -129,11 +122,6 @@ class Money(object):
             return Money(
                 amount=self.amount / Decimal(str(other)),
                 currency=self.currency)
-
-    def __abs__(self):
-        return Money(
-            amount=abs(self.amount),
-            currency=self.currency)
 
     def __rmod__(self, other):
         """
@@ -155,7 +143,7 @@ class Money(object):
     __radd__ = __add__
     __rsub__ = __sub__
     __rmul__ = __mul__
-    __rtruediv__ = __truediv__
+    __rdiv__ = __div__
 
     # _______________________________________
     # Override comparison operators
@@ -361,7 +349,7 @@ TWD = add_currency('TWD', '901', 'New Taiwan Dollar', ['TAIWAN'])
 TZS = add_currency('TZS', '834', 'Tanzanian Shilling', ['TANZANIA'])
 UAH = add_currency('UAH', '980', 'Hryvnia', ['UKRAINE'])
 UGX = add_currency('UGX', '800', 'Uganda Shilling', ['UGANDA'])
-USD = add_currency('USD', '840', 'US Dollar', ['AMERICAN SAMOA', 'BRITISH INDIAN OCEAN TERRITORY', 'ECUADOR', 'GUAM', 'MARSHALL ISLANDS', 'MICRONESIA', 'NORTHERN MARIANA ISLANDS', 'PALAU', 'PUERTO RICO', 'TIMOR-LESTE', 'TURKS AND CAICOS ISLANDS', 'UNITED STATES', 'UNITED STATES MINOR OUTLYING ISLANDS', 'VIRGIN ISLANDS (BRITISH)', 'VIRGIN ISLANDS (U.S.)'])
+USD = add_currency('USD', '840', 'US Dollar', ['AMERICAN SAMOA', 'BRITISH INDIAN OCEAN TERRITORY', 'ECUADOR', 'GUAM', 'MARSHALL ISLANDS', 'MICRONESIA', 'NORTHERN MARIANA ISLANDS', 'PALAU', 'PUERTO RICO', 'TIMOR-LESTE', 'TURKS AND CAICOS ISLANDS', 'UNITED STATES MINOR OUTLYING ISLANDS', 'VIRGIN ISLANDS (BRITISH)', 'VIRGIN ISLANDS (U.S.)'])
 UYU = add_currency('UYU', '858', 'Uruguayan peso', ['URUGUAY'])
 UZS = add_currency('UZS', '860', 'Uzbekistan Sum', ['UZBEKISTAN'])
 VEF = add_currency('VEF', '937', 'Bolivar Fuerte', ['VENEZUELA'])
